@@ -1,0 +1,93 @@
+#!/usr/bin/python
+import os, sys
+import ctypes
+KIPR=ctypes.CDLL("/usr/lib/libkipr.so")
+
+LM = 0
+CLAW = 1
+RM = 3
+
+#define forward
+def forward(speed, ticks):
+	KIPR.cmpc(LM)
+ 	KIPR.cmpc(RM)
+
+  	KIPR.mav(LM, speed)
+ 	KIPR.mav(RM, speed)
+
+  	while KIPR.gmpc(LM) < ticks:
+		pass
+	KIPR.ao()
+
+#define backward
+def backward(speed, ticks):
+    KIPR.cmpc(LM)
+   	KIPR.cmpc(RM)
+
+  	KIPR.mav(LM, -speed)
+  	KIPR.mav(RM, -speed)
+
+  	while KIPR.gmpc(LM) > -ticks:		
+		pass
+	KIPR.ao()
+            
+#define left
+def left(speed, ticks):
+	KIPR.cmpc(LM)
+   	KIPR.cmpc(RM)
+
+  	KIPR.mav(LM, -speed)
+  	KIPR.mav(RM, speed)
+
+ 	while KIPR.gmpc(RM) < ticks:
+		pass
+	KIPR.ao()
+
+#define right
+def right(speed, ticks):
+	KIPR.cmpc(LM)
+	KIPR.cmpc(RM)
+
+	KIPR.mav(LM, speed)
+	KIPR.mav(RM, -speed)
+
+	while KIPR.gmpc(LM) < ticks:
+		pass
+	KIPR.ao()
+
+#what to do if it hits a bump while moving backwards
+def back_to_bump(speed, port):
+	KIPR.mav(LM, -speed)
+	KIPR.mav(RM, -speed)
+
+	while KIPR.digital(port) == 0:
+		pass
+	ao()
+
+#what to do if it hits a bump while moving forwards
+def forward_to_bump(speed, port):
+	KIPR.mav(LM, speed)
+	KIPR.mav(RM, speed)
+
+	while KIPR.digital(port) == 0:
+		pass
+	KIPR.ao()
+
+#open the claw
+def open_claw(speed):
+	KIPR.cmpc(CLAW)	
+	KIPR.mav(CLAW, speed)
+
+	while KIPR.gmpc(CLAW) < 8500:
+		pass
+	KIPR.ao()
+
+
+#close the claw        
+def close_claw(speed):
+	KIPR.cmpc(CLAW)	
+	KIPR.mav(CLAW,-speed)
+
+	while KIPR.gmpc(CLAW) > -8500:
+		pass
+	KIPR.ao()
