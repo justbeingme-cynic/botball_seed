@@ -1,0 +1,6 @@
+
+#opening and closing the claw to get poms
+open_claw(1000)
+KIPR.msleep(3000)
+close_claw(1500)
+
